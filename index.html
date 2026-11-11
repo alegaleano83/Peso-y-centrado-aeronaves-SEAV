@@ -27,14 +27,19 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 svg{width:100%;height:auto;display:block}svg text{fill:var(--mu);font-size:11px}
 button.r{background:none;border:1px solid var(--ln);color:var(--mu);border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer}
 details{margin-top:6px}summary{cursor:pointer;color:var(--ac)}li{margin:4px 0}
+#sheet{display:none}
+@media print{:root,:root:not([data-theme="light"]),:root[data-theme="dark"]{--bg:#fff!important;--sf:#fff!important;--ink:#000!important;--mu:#444!important;--ln:#999!important;--ac:#1d5fa8!important;--ok:#16794c!important;--bad:#b3261e!important;--wn:#8a5a00!important;--fl:rgba(29,95,168,.15)!important}
+main{display:none}#sheet{display:block}body{background:#fff;color:#000;font-size:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#sheet h1{font-size:18px;margin:0 0 6px}#sheet h2{font-size:13px;margin:10px 0 4px}#sheet table{margin-bottom:4px}#sheet td,#sheet th{border:1px solid #999;padding:3px 6px}
+#sheet svg{max-width:420px;margin:0 auto}.sig{display:flex;gap:24px;margin-top:26px}.sig div{flex:1;border-top:1px solid #000;padding-top:3px;font-size:11px}@page{margin:12mm}}
 </style></head><body><main>
 <h1>Peso y balanceo</h1>
 <div class="tabs" id="tabs"></div>
-<div class="meta"><input id="tail" placeholder="Matrícula" aria-label="Matrícula"><input id="date" placeholder="Fecha" aria-label="Fecha"><button class="r" id="reset">Restablecer valores</button></div>
+<div class="meta"><input id="tail" placeholder="Matrícula" aria-label="Matrícula"><input id="date" placeholder="Fecha" aria-label="Fecha"><button class="r" id="print">Imprimir formulario</button><button class="r" id="reset">Restablecer valores</button></div>
 <div class="grid"><div><div class="card"><h2>Carga</h2><table id="rows"></table></div><div class="card"><h2>Combustible</h2><div id="fuel"></div></div></div>
 <div><div class="card"><h2>Resultados</h2><table id="res"></table><div id="chk" style="margin-top:8px"></div></div><div class="card"><h2>Envolvente peso y CG</h2><div id="chart"></div></div></div></div>
 <div class="card"><h2>Notas sobre los datos</h2><div id="notes"></div><p class="mu">Datos de tus planillas, contrastados con los manuales que subiste (detalle en las notas de cada aeronave). Los datos propios de cada aeronave (peso vacío y brazo) deben coincidir con su registro de peso y balanceo vigente. Compará los resultados con tus planillas antes de usarla en operación.</p></div>
-<p class="mu" style="text-align:center">Versión del 10 de noviembre de 2026</p></main><script>
+<p class="mu" style="text-align:center">Versión 2 del 10 de noviembre de 2026</p></main><section id="sheet"></section><script>
 const TB={"c212":[[30.3,190],[60.6,379],[90.9,569],[121.1,758],[151.4,948],[181.7,1137],[212,1327],[242.2,1516],[272.5,1706],[302.8,1896],[333.1,2085],[363.4,2275],[393.6,2464],[423.9,2654],[454.2,2843],[484.5,3033],[514.8,3223],[545,3412],[575.3,3601],[605.6,3791],[635.9,3981],[666.2,4170],[696.4,4359],[726.7,4549],[757,4739],[787.3,4929],[817.6,5118],[847.8,5307],[878.1,5497],[908.4,5687],[938.7,5876],[969,6066],[999.2,6255],[1029.5,6445],[1059.8,6634],[1090.1,6824],[1120.4,7014],[1150.6,7203],[1180.9,7392],[1211.2,7579],[1241.5,7766],[1271.8,7953],[1302,8140],[1332.3,8327],[1362.6,8514],[1392.9,8700],[1423.2,8887],[1453.3,9074],[1483.7,9261],[1514,9448],[1544.3,9635],[1574.6,9821],[1604.8,10008]],"b350":[[67,122],[134,245],[201,369],[268,493],[335,618],[402,743],[469,877],[536,1012],[603,1148],[670,1285],[737,1420],[804,1556],[871,1692],[938,1830],[1005,1986],[1072,2098],[1139,2231],[1206,2363],[1273,2495],[1340,2629],[1407,2771],[1474,2905],[1541,3042],[1608,3174],[1675,3304],[1742,3437],[1809,3570],[1876,3703],[1943,3841],[2010,3977],[2077,4115],[2144,4249],[2211,4386],[2278,4521],[2345,4660],[2412,4798],[2479,4938],[2546,5082],[2613,5224],[2680,5368],[2747,5516],[2814,5662],[2881,5808],[2948,5953],[3015,6100],[3082,6248],[3149,6392],[3216,6541],[3283,6692],[3350,6837],[3417,6985],[3484,7128],[3551,7268],[3611,7414],[3685,7615],[3752,7792],[3819,7968],[3886,8142],[3953,8313],[4020,8481],[4087,8648],[4154,8812],[4288,9135],[4355,9295],[4422,9453],[4489,9612],[4556,9769],[4623,9925],[4690,10079],[4757,10230],[4824,10379],[4891,10527],[4958,10671],[5025,10811],[5092,10949],[5159,11084],[5192,11151]]};
 TB.c212.push([1632.3,10176]);TB.b350.splice(TB.b350.findIndex(r=>r[0]==4288),0,[4221,8974]);const lin=(t,w)=>{if(w<=0)return 0;if(w<=t[0][0])return t[0][1]*w/t[0][0];for(let i=1;i<t.length;i++)if(w<=t[i][0])return t[i-1][1]+(w-t[i-1][0])/(t[i][0]-t[i-1][0])*(t[i][1]-t[i-1][1]);return t[t.length-1][1]};
 const $=s=>document.querySelector(s),fm=(x,d=0)=>isFinite(x)?x.toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
@@ -99,7 +104,12 @@ function upd(){const a=A[sel],v={};document.querySelectorAll('#rows input,#fuel 
  let h=R.wc.map(c=>ck(c[0],c[1]<=c[2],`${fm(c[1],1)} de ${fm(c[2])} ${a.wu}`)).join('');
  const pts=[['Despegue',R.to,'to'],['Aterrizaje',R.ld,'ld']].concat(R.zf?[['Cero comb.',R.zf,'zf']]:[]).map(p=>{const w=p[1][0],c=px(cg(w,p[1][1])),f=(p[2]=='ld'&&a.fwdL?a.fwdL:a.fwd)(w);return{n:p[0],w,c,f,ok:w>0&&c>=f-1e-9&&c<=a.aft(w)+1e-9}});
  h+=pts.map(p=>ck('CG de '+p.n.toLowerCase(),p.ok,`${fm(p.c,a.mac?1:a.cd)}${a.mac?' %MAC':' '+a.au}, límites ${fm(p.f,a.mac?1:a.cd)} a ${fm(a.aft(p.w),a.mac?1:a.cd)}`)).join('');
- $('#chk').innerHTML=h+wn.map(x=>`<div class="wn">⚠ ${x}</div>`).join('');chart(a,R,pts)}
+ $('#chk').innerHTML=h+wn.map(x=>`<div class="wn">⚠ ${x}</div>`).join('');chart(a,R,pts);sheet(a)}
+const esc=s=>String(s||'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+function sheet(a){const el=$('#sheet');if(!el)return;
+ const rows=a.rows.map((r,i)=>{const w=g('w'+i),ar=r[3]?g('a'+i):r[2];return`<tr><td>${r[0]}</td><td>${fm(w,1)}</td><td>${fm(ar,a.cd)}</td><td>${fm(w*ar/a.md,1)}</td></tr>`}).join('');
+ const fu=[...document.querySelectorAll('#fuel .f')].map(d=>{const e=d.querySelector('input,select');return`<tr><td>${d.querySelector('label').textContent}</td><td>${e.tagName=='SELECT'?e.selectedOptions[0].text:e.value}</td></tr>`}).join('');
+ el.innerHTML=`<h1>${a.n}: peso y balanceo</h1><table><tr><td>Matrícula: ${esc(S.tail)||'__________'}</td><td>Fecha: ${esc(S.date)||'__________'}</td><td>Piloto: ______________</td></tr></table><h2>Carga</h2><table><tr><th>Ítem</th><th>Peso (${a.wu})</th><th>Brazo (${a.au})</th><th>Momento${a.md>1?'/100':''}</th></tr>${rows}</table><h2>Combustible y límites elegidos</h2><table>${fu}</table><h2>Resultados</h2><table>${$('#res').innerHTML}</table><div>${$('#chk').innerHTML}</div><h2>Envolvente de peso y CG</h2>${$('#chart').innerHTML}<div class="sig"><div>Firma del piloto</div><div>Firma del responsable de peso y balance</div></div><p class="mu">Formulario generado por la app el ${new Date().toLocaleDateString('es-AR')}. Verificar contra el manual de vuelo y el registro de peso y balance vigente.</p>`}
 function chart(a,R,pts){const W=520,H=380,m={l:52,r:14,t:12,b:40},X=x=>m.l+(x-a.xr[0])/(a.xr[1]-a.xr[0])*(W-m.l-m.r),Y=y=>H-m.b-(y-a.yr[0])/(a.yr[1]-a.yr[0])*(H-m.t-m.b);
  const tk=(r,n)=>{const s=(r[1]-r[0])/n;return Array.from({length:n+1},(_,i)=>r[0]+i*s)};
  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Envolvente de peso y centro de gravedad">`;
@@ -111,7 +121,8 @@ function chart(a,R,pts){const W=520,H=380,m={l:52,r:14,t:12,b:40},X=x=>m.l+(x-a.
  pts.forEach((p,i)=>{const c=p.ok?'var(--ok)':'var(--bad)',x=X(p.c),y=Y(p.w);s+=(i?`<rect x="${x-5}" y="${y-5}" width="10" height="10" transform="rotate(45 ${x} ${y})" fill="${c}"/>`:`<circle cx="${x}" cy="${y}" r="6" fill="${c}"/>`)+`<text x="${x+9}" y="${y+4}" style="fill:${c};font-weight:600">${p.n}</text>`});
  s+=`<text x="${(W+m.l)/2}" y="${H-6}" text-anchor="middle">${a.mac?'CG (%MAC)':'CG ('+a.au+')'}</text><text transform="translate(12 ${H/2}) rotate(-90)" text-anchor="middle">Peso (${a.wu})</text></svg>`;
  $('#chart').innerHTML=s}
-$('#tail').oninput=$('#date').oninput=save;
+$('#tail').oninput=$('#date').oninput=()=>{save();sheet(A[sel])};
+$('#print').onclick=()=>{try{sheet(A[sel]);window.print()}catch(e){alert('No se pudo abrir la impresión desde este navegador. Probá abrir la página en su propia pestaña.')}};
 $('#reset').onclick=()=>{delete S.v[sel];build()};
 build();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
